@@ -30,3 +30,9 @@
     width: 3rem;
     height: 3rem;
 }
+
+@media only screen and (max-width: 600px) {
+    .stat {
+        font-size: 0.7rem;
+    }
+}
