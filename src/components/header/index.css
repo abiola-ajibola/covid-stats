@@ -1,5 +1,5 @@
 .head {
-    background-image: url('./images/covid-19-eu-cord.org.jpg');
+    background-image: url('%SRC_URL%/components/header/images/covid-19-eu-cord.org.jpg');
     background-position: center;
     background-repeat: no-repeat;
     background-clip: border-box;
