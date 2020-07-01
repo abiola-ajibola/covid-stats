@@ -5,6 +5,7 @@ import Newspane from './components/news-pane';
 import Statsboard from './components/stats';
 import Searchbar from './components/searchbar';
 import Chart from './components/Modal';
+import Modal from '@material-ui/core/Modal';
 
 class App extends React.Component {
   constructor(props) {
@@ -73,36 +74,36 @@ class App extends React.Component {
 
   fetchHistory(isoCode) {
     if (isoCode !== null) {
-    console.log('Preparing to fetch: ', isoCode);
-    this.setState({
-      openModal: true
-    });
+      console.log('Preparing to fetch: ', isoCode);
+      this.setState({
+        openModal: true
+      });
 
-    console.log('Fetching', isoCode)
-    fetch(`https://api.smartable.ai/coronavirus/stats/${isoCode}`, {
-      method: 'get',
-      headers: {
-        "content-type": "application/json",
-        "Subscription-Key": "d383a676794343deab023ff0a5a7f2e5"
-      }
-    })
-      .then(res => res.json())
-      .then(data => {
-        this.setState({countryName: data.location.countryOrRegion})
-        return data.stats
+      console.log('Fetching', isoCode)
+      fetch(`https://api.smartable.ai/coronavirus/stats/${isoCode}`, {
+        method: 'get',
+        headers: {
+          "content-type": "application/json",
+          "Subscription-Key": "d383a676794343deab023ff0a5a7f2e5"
+        }
       })
-      .then(stats => stats.history)
-      .then(history => {
-        let newHistory = history.map(detail => {
-          return Object.assign({}, detail, { date: new Date(detail.date).toDateString().slice(4, 10) })
+        .then(res => res.json())
+        .then(data => {
+          this.setState({ countryName: data.location.countryOrRegion })
+          return data.stats
         })
-        this.setState((state) => {
-          return {
-            countryHistory: newHistory
-          }
+        .then(stats => stats.history)
+        .then(history => {
+          let newHistory = history.map(detail => {
+            return Object.assign({}, detail, { date: new Date(detail.date).toDateString().slice(4, 10) })
+          })
+          this.setState((state) => {
+            return {
+              countryHistory: newHistory
+            }
+          })
         })
-      })
-      .catch(e => console.log('Error!', e))
+        .catch(e => console.log('Error!', e))
     } else {
       alert(`Sorry! data not available :(`)
     }
@@ -121,13 +122,18 @@ class App extends React.Component {
     return (
       <Fragment>
         <Header />
+        <Modal
+          open={openModal}
+          onClose={this.closeModal}
+          children={
+            <div className="modal-container">
+              <Chart graphData={countryHistory} close={this.closeModal} countryName={this.state.countryName} />
+            </div>
+          }
+        />
         <Searchbar onChange={this.handleInput} />
         <div className="main-container">
-          {(!openModal)
-            ? <Statsboard globalBreakdowns={filteredBreakdowns} fetchHistory={this.fetchHistory} />
-            : <div className="board-container">
-              <Chart graphData={countryHistory} close={this.closeModal} countryName={this.state.countryName} />
-            </div>}
+          <Statsboard globalBreakdowns={filteredBreakdowns} fetchHistory={this.fetchHistory} />
           <Newspane news={news} images={images} />
         </div>
       </Fragment>
